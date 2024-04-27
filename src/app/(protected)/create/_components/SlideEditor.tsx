@@ -52,7 +52,7 @@ const slideSetting: FieldType[] = [
 
 const SlideEditor = () => {
   return (
-    <div className="w-full h-full min-h-full flex flex-col justify-between gap-2">
+    <div className="w-full h-full min-h-full flex flex-col justify-between gap-2 py-4">
       <section className="flex flex-col w-full">
         <div className="w-full flex flex-col p-4 gap-5">
           <SettingElement {...slideSetting[0]} />

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+import { z } from "zod";
 export type QuestionType = "QUIZ" | "TRUE_OR_FALSE";
 export type PointType = "STANDARD" | "NO_POINTS";
 export type AnswerOptionsType = "SINGLE_SELECT" | "MULTI_SELECT";
@@ -45,13 +45,17 @@ export type CurrentSlideActions = CurrentSlideSettingActions & {
   setAnswerText: (index: number, answer: string) => void;
   setAnswerImage: (index: number, answer: string) => void;
   toggleAnswerCorrect: (index: number) => void;
+  isValidSlide: (index: number) => boolean;
 };
 
 export type SlidesState = {
+  isDraft: boolean;
   slides: Slide[];
   currentSlideIndex: number;
   currentSlide: Slide;
   currentSlideActions: CurrentSlideActions;
+  
+  setIsDraft: (isDraft: boolean) => void;
   addDefaultSlide: () => void;
   addSlide: (slide: Slide) => void;
   removeSlide: (index: number) => void;
@@ -59,6 +63,7 @@ export type SlidesState = {
   setCurrentSlide: (index: number) => void;
   removeCurrentSlide: () => void;
   duplicateCurrentSlide: () => void;
+  validateAllSlides: () => boolean;
 };
 
 const defaultSlide: Slide = {
@@ -76,12 +81,45 @@ const defaultSlide: Slide = {
   ],
 };
 
-export const useSlides = create<SlidesState>((set) => ({
+export const slideSchema = z.object({
+  id: z.number().optional(),
+  question: z
+    .string()
+    .min(1, {
+      message: "Question must be at least 1 character long",
+    })
+    .max(200, {
+      message: "Question must be at most 200 characters long",
+    }),
+  questionType: z.union([z.literal("QUIZ"), z.literal("TRUE_OR_FALSE")]),
+  timeLimit: z.number(),
+  points: z.union([z.literal("STANDARD"), z.literal("NO_POINTS")]),
+  answerOptions: z.union([
+    z.literal("SINGLE_SELECT"),
+    z.literal("MULTI_SELECT"),
+  ]),
+  image: z.string().optional(),
+  answers: z
+    .array(
+      z.object({
+        isCorrect: z.boolean(),
+        answer: z.string(),
+        imageUrl: z.string().optional(),
+      })
+    )
+    .refine((answers) => answers.reduce((a, b) => a || b.isCorrect, false), {
+      message: "At least one answer must be correct",
+    }),
+});
+
+export const useSlides = create<SlidesState>((set, get) => ({
   slides: [defaultSlide],
   currentSlideIndex: 0,
   get currentSlide() {
     return this.slides[this.currentSlideIndex];
   },
+  isDraft: true,
+  setIsDraft: (isDraft) => set({ isDraft }),
   addDefaultSlide: () =>
     set((state) => ({ slides: [...state.slides, defaultSlide] })),
   addSlide: (slide) => set((state) => ({ slides: [...state.slides, slide] })),
@@ -90,7 +128,18 @@ export const useSlides = create<SlidesState>((set) => ({
   duplicateSlide: (index) =>
     set((state) => ({ slides: [...state.slides, state.slides[index]] })),
   setCurrentSlide: (index) => set({ currentSlideIndex: index }),
+  validateAllSlides: () =>
+    get().slides.every((slide, i) => get().currentSlideActions.isValidSlide(i)),
+    
   currentSlideActions: {
+    isValidSlide: (index) => {
+      const slide = get().slides[index];
+      const tmp = slideSchema.safeParse(slide);
+      console.log(tmp);
+      const isValid = slideSchema.safeParse(slide).success;
+      console.log(slide, isValid);
+      return isValid;
+    },
     setQuestion: (question) =>
       set((state) => ({
         slides: state.slides.map((slide, i) =>
@@ -162,7 +211,7 @@ export const useSlides = create<SlidesState>((set) => ({
             : slide
         ),
       })),
-      
+
     toggleAnswerCorrect: (index) =>
       set((state) => ({
         slides: state.slides.map((slide, i) =>

@@ -34,6 +34,10 @@ const SlideMiniCard = ({ slide, ind }: { slide: Slide; ind: number }) => {
   const removeSlide = useSlides((state) => state.removeSlide);
   const setCurrentSlide = useSlides((state) => state.setCurrentSlide);
   const currentSlide = useSlides((state) => state.currentSlideIndex);
+  const isValidSlide = useSlides(
+    (state) => state.currentSlideActions.isValidSlide
+  );
+
   return (
     <div
       className={cn(
@@ -65,12 +69,19 @@ const SlideMiniCard = ({ slide, ind }: { slide: Slide; ind: number }) => {
         </h6>
         <article
           className={cn(
-            "rounded-md flex flex-col gap-2 bg-gray-100 px-2 py-2",
+            "rounded-md flex flex-col gap-2 bg-gray-100 px-2 py-2 relative",
             currentSlide == ind
               ? "border-4 border-blue-700 !p-1"
               : "hover:border-4 hover:!p-1"
           )}
         >
+          {!isValidSlide(ind) && (
+            <div className="absolute inset-y-0 -right-4 flex-col flex justify-center">
+              <div className="w-6 h-6 bg-purple-800 text-white rounded-full flex items-center justify-center my-auto">
+                <p>!</p>
+              </div>
+            </div>
+          )}
           <p className="text-center w-full text-sm font-semibold text-black/50">
             {slide.question || "Question"}
           </p>
