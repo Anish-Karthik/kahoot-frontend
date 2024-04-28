@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 const SHAPES = [Triangle, Diamond, Circle, Square];
-const COLORS = ["red", "blue", "yellow", "green"];
+const COLORS = ["bg-red-600", "bg-blue-600", "bg-yellow-600", "bg-green-600"];
 const Slide = () => {
   const ind = useSlides((state) => state.currentSlideIndex);
   const slide = useSlides((state) => state.slides[ind]);
@@ -92,11 +92,11 @@ const OptionBar = ({
     <div
       className={cn(
         `flex gap-2 bg-white p-2 rounded-md h-28 `,
-        flag && `bg-${color}-600`
+        flag && `${color}`
       )}
     >
       <div
-        className={`w-10 bg-${color}-600 rounded-sm flex items-center justify-center`}
+        className={`w-10 ${color} rounded-sm flex items-center justify-center`}
       >
         <Shape size={30} className="text-white" fill="white" />
       </div>
@@ -107,7 +107,7 @@ const OptionBar = ({
             className={cn(
               "focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-transparent border-none",
               (answer.imageUrl || answer.answer.length > 0) &&
-                `bg-${color}-600 text-white`
+                `${color} text-white`
             )}
             value={answer.answer}
             rows={Math.ceil(answer.answer.length / 30)}
