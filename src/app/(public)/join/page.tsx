@@ -20,7 +20,7 @@ export default function Page({
             height={50}
           />
         </div>
-        <UsernameForm />
+        <UsernameForm href={`/instructions?quizId=${searchParams.quizId}`} />
       </div>
     </section>
   );
