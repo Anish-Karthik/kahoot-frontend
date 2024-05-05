@@ -1,4 +1,3 @@
-
 export type LiveUser = {
   username: string;
   imageUrl: string;
@@ -16,3 +15,46 @@ export type ChatMessage = {
   content: string;
   sender: LiveUser;
 };
+
+// Enums defined similarly to Java enums
+export enum QuestionType {
+  QUIZ = "QUIZ",
+  TRUE_OR_FALSE = "TRUE_OR_FALSE",
+}
+
+export enum PointType {
+  STANDARD = "STANDARD",
+  NO_POINTS = "NO_POINTS",
+}
+
+export enum AnswerOptionsType {
+  SINGLE_SELECT = "SINGLE_SELECT",
+  MULTI_SELECT = "MULTI_SELECT",
+}
+
+interface Quiz {
+  id: number;
+  code: string;
+  questionSets: QuestionSet[]; // Array of QuestionSet
+}
+// Interface for QuestionSet, assuming it has an id and possibly other fields
+export interface QuestionSet {
+  id: number;
+  name?: string; // nullable in Java, so it's optional in TypeScript
+  quiz?: Quiz; // optional as per the @ManyToOne(optional = true) annotation
+  questions: Question[]; // Array of Question, initialized to an empty array in Java
+}
+
+// TypeScript interface for the Question entity
+export interface Question {
+  id: number;
+  questionSet?: QuestionSet; // optional due to the "optional: true" in @ManyToOne
+  question: string;
+  image?: string; // Assuming image can be optional
+  questionType: QuestionType;
+  timeLimit: number;
+  points: PointType;
+  answerOptions: AnswerOptionsType;
+  options: string[];
+  correctAnswerIndices: number[];
+}

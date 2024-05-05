@@ -7,18 +7,19 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const Slides = () => {
-  const state = useSlides();
+  const slides = useSlides((state) => state.slides);
+  const addDefaultSlide = useSlides((state) => state.addDefaultSlide);
   return (
     <div className="flex flex-col items-center gap-2 max-h-screen overflow-y-auto">
       <div className="flex flex-col max-h-[85vh] overflow-y-auto w-full">
-        {state.slides.map((slide, ind) => (
+        {slides.map((slide, ind) => (
           <SlideMiniCard key={slide.id} slide={slide} ind={ind} />
         ))}
       </div>
       <div className="">
         <Button
           className="bg-blue-800 font-bold rounded-sm"
-          onClick={() => state.addDefaultSlide()}
+          onClick={() => addDefaultSlide()}
         >
           Add Question
         </Button>

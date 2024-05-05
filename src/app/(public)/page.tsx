@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import JoinQuizForm from "./_components/join-quiz-form";
+import Link from "next/link";
 // Kahoot.it landing page
 export default function Home() {
   return (
@@ -19,9 +20,11 @@ export default function Home() {
       </div>
       <div className="fixed bottom-10 inset-x-0 z-20">
         <div className="flex justify-center gap-4">
-          <Button className="text-center font-bold bg-white text-black/90 w-32 rounded-sm">
-            Create
-          </Button>
+          <Link href="/create">
+            <Button className="text-center font-bold bg-white text-black/90 w-32 rounded-sm">
+              Create
+            </Button>
+          </Link>
           {/* <Button className="text-center font-bold bg-white text-black/90 w-32 rounded-sm">Join</Button> */}
         </div>
       </div>

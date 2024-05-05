@@ -1,7 +1,7 @@
 import Image from "next/image";
 import QuestionSetActions from "./QuestionSetActions";
 
-const Navbar = () => {
+const Navbar = ({ id }: { id?: number }) => {
   return (
     <div className="w-full flex justify-between items-center h-full px-8">
       <Image
@@ -10,7 +10,7 @@ const Navbar = () => {
         height="20"
         alt="logo"
       />
-      <QuestionSetActions />
+      <QuestionSetActions id={id} />
     </div>
   );
 };

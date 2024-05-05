@@ -55,6 +55,7 @@ export type SlidesState = {
   currentSlide: Slide;
   currentSlideActions: CurrentSlideActions;
   
+  setSlides(slides: Slide[]): void;
   setIsDraft: (isDraft: boolean) => void;
   addDefaultSlide: () => void;
   addSlide: (slide: Slide) => void;
@@ -119,12 +120,22 @@ export const useSlides = create<SlidesState>((set, get) => ({
     return this.slides[this.currentSlideIndex];
   },
   isDraft: true,
+  setSlides: (slides) => set({ slides }),
   setIsDraft: (isDraft) => set({ isDraft }),
   addDefaultSlide: () =>
     set((state) => ({ slides: [...state.slides, defaultSlide] })),
   addSlide: (slide) => set((state) => ({ slides: [...state.slides, slide] })),
   removeSlide: (index) =>
-    set((state) => ({ slides: state.slides.filter((_, i) => i !== index) })),
+    set((state) => {
+      if (state.slides.length === 1) return state;
+      return {
+        slides: state.slides.filter((_, i) => i !== index),
+        currentSlideIndex: Math.min(
+          state.currentSlideIndex,
+          state.slides.length - 2
+        ),
+      };
+    }),
   duplicateSlide: (index) =>
     set((state) => ({ slides: [...state.slides, state.slides[index]] })),
   setCurrentSlide: (index) => set({ currentSlideIndex: index }),
