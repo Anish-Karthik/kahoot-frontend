@@ -13,7 +13,7 @@ const page = async ({ params }: { params: { id: number } }) => {
       convertQuestionToSlide(question)
     );
 
-    return <EditSlidesPage slides={slides} id={data.id} />;
+    return <EditSlidesPage slides={slides} id={data.id} name={data.name} />;
   } catch (error) {
     console.log(error);
     return <div>Error</div>;

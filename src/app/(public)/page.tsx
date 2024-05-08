@@ -20,7 +20,7 @@ export default function Home() {
       </div>
       <div className="fixed bottom-10 inset-x-0 z-20">
         <div className="flex justify-center gap-4">
-          <Link href="/create">
+          <Link href="/questionset">
             <Button className="text-center font-bold bg-white text-black/90 w-32 rounded-sm">
               Create
             </Button>

@@ -5,10 +5,48 @@ import Image from "next/image";
 import edit from "/public/pen.jpg";
 import trash from "/public/trash.jpg";
 import useSWR, { useSWRConfig } from "swr";
-import { QuestionSet } from "@/types";
+import { QuestionSet, Quiz } from "@/types";
 import { api } from "@/lib/axiosConfig";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { generateRandomCode } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+
+const Page = () => {
+  const { data, error, isLoading } = useSWR<{
+    data: QuestionSet[];
+  }>("/questionset", api);
+  if (error || !data) return <div>failed to load</div>;
+  if (isLoading) return <div>loading...</div>;
+  console.log(data);
+  return (
+    <section className="w-full h-full flex flex-col">
+      <div className="bg-image fixed inset-0">
+        <Image
+          src="/background.png"
+          alt="Background Image"
+          layout="fill"
+          objectFit="cover"
+        />
+      </div>
+      <div className="mx-auto my-8 z-50 relative w-full flex items-center justify-center max-w-5xl">
+        <h1 className="text-white font-extrabold text-4xl">Question Sets</h1>
+        <Link href="/questionset/create" className="absolute right-0 top-0">
+          <button className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-md">
+            Create Question Set
+          </button>
+        </Link>
+      </div>
+      <section className="w-full h-full flex flex-col max-w-5xl mx-auto gap-6">
+        {data.data.map((q) => (
+          <QuestionSetCard key={q.id} questionSet={q} />
+        ))}
+      </section>
+    </section>
+  );
+};
+
+export default Page;
 
 const Popup = ({
   top,
@@ -76,7 +114,7 @@ const Popup = ({
 const QuestionSetCard = ({ questionSet }: { questionSet: QuestionSet }) => {
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-
+  const router = useRouter();
   const handleDivClick = (event: any) => {
     if (popupVisible) {
       setPopupVisible(false);
@@ -95,7 +133,7 @@ const QuestionSetCard = ({ questionSet }: { questionSet: QuestionSet }) => {
   };
 
   return (
-    <div className="flex rounded-md  bg-white text-white p-2 w-4/6 h-36 shadow-color-500 shadow-md cursor-pointer transform hover:scale-105 transition-transform duration-300 w-full">
+    <div className="flex rounded-md  bg-white text-white p-2 h-36 shadow-color-500 shadow-md cursor-pointer transform hover:scale-105 transition-transform duration-300 w-full">
       <div className="w-44 h-32 bg-black relative  rounded-md">
         <Image
           className="rounded-md bg-slate-500"
@@ -110,8 +148,8 @@ const QuestionSetCard = ({ questionSet }: { questionSet: QuestionSet }) => {
           Saved
         </div>
         <div
-          className="absolute bottom-2.5 right-2.5 bg-gray-600 rounded-sm text-white text-xs pt-1.5 font-semibold pl-0.5"
-          style={{ width: "73px", height: "25px", letterSpacing: "0.025em" }}
+          className="absolute bottom-2.5 right-2.5 bg-gray-600 rounded-sm text-white text-xs pt-1.5 font-semibold px-1"
+          style={{ height: "25px", letterSpacing: "0.025em" }}
         >
           {questionSet.questions.length} questions
         </div>
@@ -153,14 +191,40 @@ const QuestionSetCard = ({ questionSet }: { questionSet: QuestionSet }) => {
             {/* dineshbabud21cs */}
             public
           </div>
-          <div className="absolute right-[-1em] bottom-0 flex w-44 h-8">
-            <div className="w-24 h-16 text-gray-600 text-sm pt-2">
+          <div className="absolute right-2 bottom-0 flex gap-2 h-8">
+            <div className="w-24 h-16 text-gray-600 text-sm ">
               Apr 24,2024
               {/* created At */}
             </div>
+            {/* <CreateQuiz questionSet={questionSet} /> */}
+            <div
+              // href={`/questionset/${questionSet.id}`}
+              className=" h-8 bg-purple-600 hover:bg-purple-800 rounded-sm font-semibold text-sm flex w-full justify-center items-center"
+              style={{ letterSpacing: "0.025px" }}
+              onClick={async () => {
+                try {
+                  const quiz: Quiz = {
+                    id: -1,
+                    code: generateRandomCode(6),
+                    questionSets: [
+                      questionSet,
+                    ],
+                  }
+                  const res: Quiz = (await api.post(`/quiz`, quiz)).data;
+                  console.log(res);
+                  toast.success("Quiz created successfully");
+                  router.push(`/lobby?quizId=${res.id}&gameCode=${res.code}`);
+                } catch (error) {
+                  console.log(error);
+                  toast.error("Error creating quiz");
+                }
+              }}
+            >
+              Host
+            </div>
             <Link
               href={`/questionset/${questionSet.id}`}
-              className="w-16 h-8 bg-blue-600 hover:bg-blue-800 rounded-sm font-semibold pl-5 pt-1.5 text-sm"
+              className=" h-8 bg-blue-600 hover:bg-blue-800 rounded-sm font-semibold text-sm flex w-full justify-center items-center"
               style={{ letterSpacing: "0.025px" }}
             >
               Edit
@@ -172,33 +236,32 @@ const QuestionSetCard = ({ questionSet }: { questionSet: QuestionSet }) => {
   );
 };
 
-const Page = () => {
-  const { data, error, isLoading } = useSWR<{
-    data: QuestionSet[];
-  }>("/questionset", api);
-  if (error || !data) return <div>failed to load</div>;
-  if (isLoading) return <div>loading...</div>;
-  console.log(data);
-  return (
-    <section className="w-full h-full flex flex-col">
-      <div className="bg-image fixed inset-0">
-        <Image
-          src="/background.png"
-          alt="Background Image"
-          layout="fill"
-          objectFit="cover"
-        />
-      </div>
-      <div className="mx-auto my-8 z-50 relative">
-        <h1 className="text-white font-extrabold text-4xl">Question Sets</h1>
-      </div>
-      <section className="w-full h-full flex flex-col max-w-5xl mx-auto gap-6">
-        {data.data.map((q) => (
-          <QuestionSetCard key={q.id} questionSet={q} />
-        ))}
-      </section>
-    </section>
-  );
-};
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
 
-export default Page;
+// const CreateQuiz = ({ questionSet }: { questionSet: QuestionSet }) => {
+//   return (
+//     <Dialog>
+//       <DialogTrigger>
+//         <div className="h-8 bg-blue-600 hover:bg-blue-800 rounded-sm font-semibold text-sm flex w-full justify-center items-center">
+//           Create Quiz
+//         </div>
+//       </DialogTrigger>
+//       <DialogContent>
+//         <DialogHeader>
+//           <DialogTitle>Are you absolutely sure?</DialogTitle>
+//           <DialogDescription>
+//             This action cannot be undone. This will permanently delete your
+//             account and remove your data from our servers.
+//           </DialogDescription>
+//         </DialogHeader>
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };

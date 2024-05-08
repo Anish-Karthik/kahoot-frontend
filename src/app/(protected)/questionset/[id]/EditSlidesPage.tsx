@@ -8,15 +8,19 @@ import { Slide, useSlides } from "../create/_components/slides.hook";
 
 const EditSlidesPage = ({
   id,
-  slides
+  slides,
+  name
 }: {
   id: number,
-  slides: Slide[]
+  slides: Slide[],
+  name?: string
 }) => {
   const setSlides = useSlides((state) => state.setSlides);
+  const setName = useSlides((state) => state.setName);
   React.useEffect(() => {
     setSlides(slides);
-  }, [setSlides, slides]);
+    setName(name || "");
+  }, [name, setName, setSlides, slides]);
   return (
     <section className="w-full h-full min-h-screen">
       <div className="h-12 w-full border-b shadow-black shadow-sm bg-white fixed inset-x-0">

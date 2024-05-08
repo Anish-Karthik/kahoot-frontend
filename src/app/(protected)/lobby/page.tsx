@@ -1,9 +1,10 @@
-"use client";
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import "./lobby.css";
 import { FaGlobe, FaAngleUp, FaUser, FaUnlockAlt } from "react-icons/fa";
 import ChatRoom from "@/components/lobby/ChatRoom";
 import PlayerCount from "@/components/lobby/PlayerCount";
+import StartQuiz from "./StartQuiz";
+import Link from "next/link";
 
 type Player = {
   id?: number;
@@ -34,7 +35,11 @@ const demoPlayers: Player[] = [
   },
 ];
 
-const Lobby = ({ searchParams }: { searchParams: { quizId: string } }) => {
+const Lobby = ({
+  searchParams,
+}: {
+  searchParams: { quizId: number; gameCode: string };
+}) => {
   return (
     <section className="home">
       <div className="header">
@@ -43,7 +48,7 @@ const Lobby = ({ searchParams }: { searchParams: { quizId: string } }) => {
             <FaGlobe /> <h3 className="font-semibold"> EN</h3>
           </div>
           <div className="text">
-            <h3>Game PIN: {searchParams.quizId}</h3>
+            <h3>Game PIN: {searchParams.gameCode}</h3>
           </div>
           <div className="absolute left-3 size-6 rounded-full bg-white flex items-center justify-center cursor-pointer">
             <FaAngleUp />
@@ -63,10 +68,12 @@ const Lobby = ({ searchParams }: { searchParams: { quizId: string } }) => {
           <div className="mr-5 size-6 rounded-full bg-white flex items-center justify-center cursor-pointer">
             <FaUnlockAlt />
           </div>
-          <button className="start">Start</button>
+          <Link href={`/quiz?quizId=${searchParams.quizId}&gameCode=${searchParams.gameCode}`} className="start" >
+            Start
+          </Link>
         </div>
       </div>
-      <ChatRoom roomNumber={searchParams.quizId} />
+      <ChatRoom roomNumber={searchParams.gameCode} />
     </section>
   );
 };

@@ -32,7 +32,7 @@ export enum AnswerOptionsType {
   MULTI_SELECT = "MULTI_SELECT",
 }
 
-interface Quiz {
+export interface Quiz {
   id: number;
   code: string;
   questionSets: QuestionSet[]; // Array of QuestionSet

@@ -12,12 +12,12 @@ import { useRouter } from "next/navigation";
 const QuestionSetActions = ({ id }: { id?: number }) => {
   const validateAll = useSlides((state) => state.validateAllSlides);
   const slides = useSlides((state) => state.slides);
-  const setSlides = useSlides((state) => state.setSlides);
-  const setCurrentSlide = useSlides((state) => state.setCurrentSlide);
+  const name = useSlides((state) => state.name);
   const router = useRouter();
   console.log(id);
   const questionSet: QuestionSet = {
     id: id || -1,
+    name: name,
     questions: slides.map<Question>((slide) => convertSlideToQuestion(slide)),
   };
   return (

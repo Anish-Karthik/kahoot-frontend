@@ -51,10 +51,12 @@ export type CurrentSlideActions = CurrentSlideSettingActions & {
 export type SlidesState = {
   isDraft: boolean;
   slides: Slide[];
+  name: string;
   currentSlideIndex: number;
   currentSlide: Slide;
   currentSlideActions: CurrentSlideActions;
-  
+
+  setName: (name: string) => void;
   setSlides(slides: Slide[]): void;
   setIsDraft: (isDraft: boolean) => void;
   addDefaultSlide: () => void;
@@ -81,6 +83,12 @@ const defaultSlide: Slide = {
     { isCorrect: false, answer: "" },
   ],
 };
+
+export const nameSchema = z.string().min(1, {
+  message: "Name must be at least 1 character long",
+});
+
+export const validateName = (name: string): boolean => nameSchema.safeParse(name).success;
 
 export const slideSchema = z.object({
   id: z.number().optional(),
@@ -120,6 +128,8 @@ export const useSlides = create<SlidesState>((set, get) => ({
     return this.slides[this.currentSlideIndex];
   },
   isDraft: true,
+  name: "",
+  setName: (name) => set({ name }),
   setSlides: (slides) => set({ slides }),
   setIsDraft: (isDraft) => set({ isDraft }),
   addDefaultSlide: () =>
@@ -140,8 +150,8 @@ export const useSlides = create<SlidesState>((set, get) => ({
     set((state) => ({ slides: [...state.slides, state.slides[index]] })),
   setCurrentSlide: (index) => set({ currentSlideIndex: index }),
   validateAllSlides: () =>
-    get().slides.every((slide, i) => get().currentSlideActions.isValidSlide(i)),
-    
+    get().slides.every((slide, i) => get().currentSlideActions.isValidSlide(i)) && validateName(get().name),
+
   currentSlideActions: {
     isValidSlide: (index) => {
       const slide = get().slides[index];

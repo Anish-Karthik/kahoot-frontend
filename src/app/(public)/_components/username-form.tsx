@@ -21,7 +21,10 @@ const UsernameForm = ({ href }: { href?: string }) => {
     ) {
       e.preventDefault();
     } else {
-      router.push(href + `&username=${username}`);
+      const route = href + `&username=${username}`;
+      console.log(route);
+      e.preventDefault();
+      router.push(route);
     }
   };
   return (
