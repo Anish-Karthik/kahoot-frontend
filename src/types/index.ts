@@ -4,16 +4,44 @@ export type LiveUser = {
 };
 
 export enum MessageType {
-  ERROR = "ERROR",
-  UPDATE = "UPDATE",
   JOIN = "JOIN",
   LEAVE = "LEAVE",
+  MESSAGE = "MESSAGE",
+  GET = "GET",
+  USERS = "USERS",
+  ACTIVE_USERS = "ACTIVE_USERS",
+  START = "START",
+  NEXT = "NEXT",
+  ANSWER = "ANSWER",
+  UPDATE = "UPDATE",
+  QUESTION = "QUESTION",
+  LEADERBOARD = "LEADERBOARD",
+  END = "END",
+}
+
+export enum Receiver {
+  ALL = "ALL",
+  HOST = "HOST",
+  PLAYER = "PLAYER",
 }
 
 export type ChatMessage = {
   type: MessageType;
   content: string;
   sender: LiveUser;
+  receiver: Receiver;
+};
+
+export type Leaderboard = {
+  username: string;
+  score: number;
+};
+
+export type AdvancedChatMessage = ChatMessage & {
+  question?: Question;
+  leaderboard?: Leaderboard[];
+  answerFrequency?: number[];
+  delayInSeconds?: number;
 };
 
 // Enums defined similarly to Java enums
