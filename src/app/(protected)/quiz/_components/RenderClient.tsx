@@ -8,8 +8,7 @@ import {
   Question,
   Receiver,
 } from "@/types";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import SockJS from "sockjs-client";
@@ -20,6 +19,7 @@ import {
   useSlides,
 } from "../../questionset/create/_components/slides.hook";
 import { convertSlideToQuestion } from "@/lib/utils";
+import SimpleCounter from "./SimpleCounter";
 
 // RenderClient
 // 1. timer -> 3 seconds delay and auto to next question to all clients in quiz
@@ -47,7 +47,7 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
   const slidesState = useSlides();
   useEffect(() => {
     slidesState.setSlides(questions);
-  }, [questions, slidesState]);
+  }, [questions]);
 
   const gameCode = searchParams.get("gameCode");
 
@@ -99,6 +99,7 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
   const activeUserEvents = (message: Stomp.Message) => {};
   const quizEvents = (message: Stomp.Message) => {
     const msg: AdvancedChatMessage = JSON.parse(message.body);
+    console.log(msg);
     const reciever = msg.receiver;
     if (reciever === Receiver.PLAYER) {
       return;
@@ -109,7 +110,7 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
         setShowOptions(true);
         break;
       case MessageType.START:
-        // setLoading(true);
+        setLoading(true);
         break;
       case MessageType.NEXT:
         setShowAnswerFrequency(true);
@@ -133,7 +134,7 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
       type: MessageType.QUESTION,
       question: convertSlideToQuestion(slidesState.currentSlide),
       receiver: Receiver.PLAYER,
-      delayInSeconds: 5,
+      delayInSeconds: 7,
     };
     stompClient?.send(
       `/app/chat/${gameCode}/question`,
@@ -158,7 +159,6 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
   };
 
   const renderLeaderboard = () => {
-
     const msg: Partial<AdvancedChatMessage> = {
       type: MessageType.LEADERBOARD,
       receiver: Receiver.HOST,
@@ -236,7 +236,9 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
         <div className="flex flex-col gap-3">
           <div className="flex justify-between">
             <h1>Question {currQuestion + 1}</h1>
-            {/* <h1>Time Left: s</h1> */}
+            <h1>
+              Time Left: <SimpleCounter />s
+            </h1>
           </div>
           {/* <ProgressBar time={slidesState.currentSlide.timeLimit} /> */}
           <h1>{slidesState.currentSlide.question}</h1>
@@ -264,11 +266,12 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
 
   if (!isStarted) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-screen flex flex-col items-center justify-center">
         <div className="flex flex-col gap-3">
           <h1>Waiting for the host to start the quiz</h1>
           <Button
             onClick={() => {
+              console.log("Start");
               stompClient?.send(
                 `/app/chat/${gameCode}/start`,
                 {},

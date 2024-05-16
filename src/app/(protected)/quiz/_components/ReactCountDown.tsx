@@ -22,7 +22,7 @@ const ReactCountDown = ({
         setCounter(defaultTimer);
       }, 1000);
     }
-  }, [counter, defaultTimer, setLoading, started]);
+  }, [counter, defaultTimer, started]);
 
   useEffect(() => {
     if (typeof counter !== "string" && counter > 1) {
@@ -37,7 +37,10 @@ const ReactCountDown = ({
       setTimeout(() => {
         setCounter("Let's begin");
       }, 1000);
-      setLoading && setLoading(false);
+    } else if (typeof counter === "string" && counter === "Let's begin") {
+      setTimeout(() => {
+        setLoading && setLoading(false);
+      }, 1000);
     }
   }, [counter, setLoading, started]);
 

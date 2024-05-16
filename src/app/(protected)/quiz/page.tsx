@@ -20,7 +20,11 @@ const page = async ({
     .flat();
   const slides: Slide[] = questions.map(convertQuestionToSlide);
   console.log(questions);
-  return <RenderClient questions={slides} />;
+  return (
+    <div className="h-full w-full">
+      <RenderClient questions={slides} />
+    </div>
+  );
 };
 
 export default page;
