@@ -36,7 +36,7 @@ export const convertQuestionToSlide = (question: Question): Slide => {
     answerOptions: question.answerOptions,
     answers: question.options.map((option, i) => {
       return {
-        isCorrect: question.correctAnswerIndices.includes(i),
+        isCorrect: question.correctAnswerIndices?.includes(i),
         answer: option,
         imageUrl: undefined,
       };

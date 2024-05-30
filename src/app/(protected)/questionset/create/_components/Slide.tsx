@@ -66,7 +66,7 @@ const Slide = () => {
 
 export default Slide;
 
-const OptionBar = ({
+export const OptionBar = ({
   answer,
   shape: Shape,
   color,

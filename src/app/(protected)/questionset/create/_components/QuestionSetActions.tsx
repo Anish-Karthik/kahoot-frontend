@@ -14,6 +14,7 @@ const QuestionSetActions = ({ id }: { id?: number }) => {
   const slides = useSlides((state) => state.slides);
   const name = useSlides((state) => state.name);
   const router = useRouter();
+  console.log(slides)
   console.log(id);
   const questionSet: QuestionSet = {
     id: id || -1,
@@ -39,7 +40,9 @@ const QuestionSetActions = ({ id }: { id?: number }) => {
               const res = !id
                 ? await api.post("/questionset", questionSet)
                 : await api.put(`/questionset/${id}`, questionSet);
+              console.log(questionSet)
               const newQuestionSet: QuestionSet = res.data;
+              console.log(newQuestionSet);
               toast.success("Question set saved successfully");
               router.push(`/questionset/${newQuestionSet.id}`);
             } catch (error) {

@@ -17,6 +17,7 @@ export enum MessageType {
   QUESTION = "QUESTION",
   LEADERBOARD = "LEADERBOARD",
   END = "END",
+  ANSWER_FREQUENCY = "ANSWER_FREQUENCY",
 }
 
 export enum Receiver {
@@ -37,11 +38,19 @@ export type Leaderboard = {
   score: number;
 };
 
+export type Verdict = {
+  correct: boolean;
+  score: number;
+};
+
 export type AdvancedChatMessage = ChatMessage & {
   question?: Question;
   leaderboard?: Leaderboard[];
   answerFrequency?: number[];
   delayInSeconds?: number;
+  answerIndex?: number;
+  verdict?: Verdict;
+  questionIndex?: number;
 };
 
 // Enums defined similarly to Java enums

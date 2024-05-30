@@ -99,6 +99,7 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
   const activeUserEvents = (message: Stomp.Message) => {};
   const quizEvents = (message: Stomp.Message) => {
     const msg: AdvancedChatMessage = JSON.parse(message.body);
+    toast.success("Message received");
     console.log(msg);
     const reciever = msg.receiver;
     if (reciever === Receiver.PLAYER) {
@@ -112,11 +113,13 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
       case MessageType.START:
         setLoading(true);
         break;
-      case MessageType.NEXT:
+      case MessageType.ANSWER_FREQUENCY:
+        console.log(msg);
         setShowAnswerFrequency(true);
-        setAnswerFrequency(msg.answerFrequency || []);
+        setAnswerFrequency(msg?.answerFrequency || []);
         break;
       case MessageType.LEADERBOARD:
+        console.log(msg);
         setShowAnswerFrequency(false);
         setShowOptions(false);
         setShowScoreBoard(true);
@@ -171,6 +174,21 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
     );
   };
 
+  const renderAnswerFrequency = () => {
+    console.log("Answer Frequency");
+    const msg: Partial<AdvancedChatMessage> = {
+      type: MessageType.ANSWER_FREQUENCY,
+      receiver: Receiver.HOST,
+      questionIndex: currQuestion,
+    };
+    // Answer Frequency
+    stompClient?.send(
+      `/app/chat/${gameCode}/answerFrequency`,
+      {},
+      JSON.stringify(msg)
+    );
+  };
+
   if (loading) {
     return (
       <ReactCountDown
@@ -183,6 +201,32 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
     );
   }
 
+  if (showAnswerFrequency) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="flex flex-col gap-3">
+          <h1>Answer Frequency</h1>
+          <div className="flex flex-col gap-3">
+            {Object.entries(answerFrequency).map(([key, value]) => (
+              <div key={key} className="flex justify-between">
+                <h1>Option {key}</h1>
+                <h1>{value}</h1>
+              </div>
+            ))}
+          </div>
+          <Button
+            onClick={() => {
+              console.log("hi");
+              toast.success("hiu");
+              renderLeaderboard();
+            }}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }
   // LEADERBOARD
   if (showScoreBoard) {
     return (
@@ -210,25 +254,6 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
     );
   }
 
-  if (showAnswerFrequency) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="flex flex-col gap-3">
-          <h1>Leaderboard</h1>
-          <div className="flex flex-col gap-3">
-            {Object.entries(answerFrequency).map(([key, value]) => (
-              <div key={key} className="flex justify-between">
-                <h1>Option {key}</h1>
-                <h1>{value}</h1>
-              </div>
-            ))}
-          </div>
-          <Button onClick={renderLeaderboard}>Next</Button>
-        </div>
-      </div>
-    );
-  }
-
   // QUESTION with options
   if (showOptions) {
     return (
@@ -237,7 +262,14 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
           <div className="flex justify-between">
             <h1>Question {currQuestion + 1}</h1>
             <h1>
-              Time Left: <SimpleCounter />s
+              Time Left:{" "}
+              <SimpleCounter
+                onSuccess={() => {
+                  renderAnswerFrequency();
+                }}
+                timer={questions[currQuestion].timeLimit / 4}
+              />
+              s
             </h1>
           </div>
           {/* <ProgressBar time={slidesState.currentSlide.timeLimit} /> */}
