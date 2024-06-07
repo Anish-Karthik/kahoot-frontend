@@ -65,10 +65,6 @@ export default function ChatRoom({ roomNumber }: { roomNumber: string }) {
         // Update the active users list
         updateActivePlayer(msg.sender);
         break;
-      case MessageType.ERROR:
-        console.log(msg);
-        // toast.error(msg.content);
-        break;
       default:
         break;
     }
