@@ -247,7 +247,7 @@ const ChatRoom: React.FC = () => {
 };
 export default ChatRoom;
 
-export function QuestionOptions({
+function QuestionOptions({
   submitAnswer,
   slide,
   questionInd = 0,
