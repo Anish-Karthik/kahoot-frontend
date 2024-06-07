@@ -16,8 +16,8 @@ const Page = () => {
   const { data, error, isLoading } = useSWR<{
     data: QuestionSet[];
   }>("/questionset", api);
-  if (error || !data) return <div>failed to load</div>;
   if (isLoading) return <div>loading...</div>;
+  if (error || !data) return <div>{JSON.stringify(error)}</div>;
   console.log(data);
   return (
     <section className="w-full h-full flex flex-col">
