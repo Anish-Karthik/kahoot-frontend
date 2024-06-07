@@ -130,15 +130,22 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
     }
   };
 
-  const sendCurrentQuestionToServer = () => {
+  const sendCurrentQuestionToServer = (qno: number) => {
     // QUESTION after 5 seconds
     // receives response from server after 5 seconds
+    console.log(slidesState.slides[qno]);
     const currentQuestion: Partial<AdvancedChatMessage> = {
       type: MessageType.QUESTION,
-      question: convertSlideToQuestion(slidesState.currentSlide),
+      question: convertSlideToQuestion(slidesState.slides[qno]),
       receiver: Receiver.PLAYER,
-      delayInSeconds: 7,
+      questionIndex: qno,
+      delayInSeconds: 5,
     };
+    stompClient?.send(
+      `/app/chat/${gameCode}/getReady`,
+      {},
+      JSON.stringify({ type: MessageType.GET_READY, receiver: Receiver.PLAYER })
+    );
     stompClient?.send(
       `/app/chat/${gameCode}/question`,
       {},
@@ -147,7 +154,7 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
   };
 
   const renderQuestionClientOnly = (qno: number) => {
-    if (qno > slidesState.slides.length) {
+    if (qno >= slidesState.slides.length) {
       stompClient?.send(
         `/app/chat/${gameCode}/end`,
         {},
@@ -155,9 +162,10 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
       );
       return;
     }
-    setCurrQuestion(qno);
+    console.log(qno);
     slidesState.setCurrentSlide(qno);
-    sendCurrentQuestionToServer();
+    setCurrQuestion(qno);
+    sendCurrentQuestionToServer(qno);
     setQuestionLoader(true);
   };
 
@@ -285,6 +293,8 @@ const RenderClient = ({ questions }: { questions: Slide[] }) => {
   }
 
   if (questionLoader) {
+    console.log(slidesState.slides);
+    console.log(slidesState.currentSlide);
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="flex flex-col gap-3">

@@ -88,7 +88,8 @@ export const nameSchema = z.string().min(1, {
   message: "Name must be at least 1 character long",
 });
 
-export const validateName = (name: string): boolean => nameSchema.safeParse(name).success;
+export const validateName = (name: string): boolean =>
+  nameSchema.safeParse(name).success;
 
 export const slideSchema = z.object({
   id: z.number().optional(),
@@ -148,9 +149,15 @@ export const useSlides = create<SlidesState>((set, get) => ({
     }),
   duplicateSlide: (index) =>
     set((state) => ({ slides: [...state.slides, state.slides[index]] })),
-  setCurrentSlide: (index) => set({ currentSlideIndex: index }),
+  setCurrentSlide: (index) =>
+    set((state) => ({
+      currentSlideIndex: index,
+      currentSlide: state.slides[index],
+    })),
   validateAllSlides: () =>
-    get().slides.every((slide, i) => get().currentSlideActions.isValidSlide(i)) && validateName(get().name),
+    get().slides.every((slide, i) =>
+      get().currentSlideActions.isValidSlide(i)
+    ) && validateName(get().name),
 
   currentSlideActions: {
     isValidSlide: (index) => {
